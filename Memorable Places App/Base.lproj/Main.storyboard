@@ -62,7 +62,7 @@
                     <navigationItem key="navigationItem" title="Places" id="EH4-bk-FHH">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="isf-zg-03m">
                             <connections>
-                                <segue destination="BYZ-38-t0r" kind="show" id="Xb1-vU-nag"/>
+                                <segue destination="BYZ-38-t0r" kind="show" identifier="toMap" id="Xb1-vU-nag"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
