@@ -8,16 +8,36 @@
 
 import UIKit
 
+
+
 class Places: UITableViewController {
 
+    var places = [Dictionary<String,String>()]
+    var activePlace = -1
+    
+    @IBOutlet var table: UITableView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        if let tmpPlaces = UserDefaults.standard.object(forKey: "places") as? [Dictionary<String,String>] {
+            places = tmpPlaces
+        }
+        if places.count == 1 && places[0].count == 0 {
+            places.remove(at: 0)
+            places.append(["name": "Taj Mahal", "lat":"27.175277", "long":"78.042128"])
+            UserDefaults.standard.set(places, forKey: "places")
+        }
+        activePlace = -1
+        table.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -34,20 +54,31 @@ class Places: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 4
+        return places.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.default, reuseIdentifier: "Cell")
-        cell.textLabel?.text = "Row \(indexPath.row)"
+        if places[indexPath.row]["name"] != nil {
+           cell.textLabel?.text = places[indexPath.row]["name"]
+        }
+        
 
 
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        activePlace = indexPath.row
         performSegue(withIdentifier: "toMap", sender: nil)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toMap" {
+            let mapViewController = segue.destination as! Map
+            mapViewController.activePlace = activePlace
+            mapViewController.places = places
+        }
     }
 
     /*
@@ -63,10 +94,10 @@ class Places: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            places.remove(at: indexPath.row)
+            UserDefaults.standard.set(places, forKey: "places")
+            table.reloadData()
+        }
     }
     
 
